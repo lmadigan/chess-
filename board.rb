@@ -17,7 +17,10 @@ attr_accessor :grid
   @grid.each_with_index do |row, idx|
     if idx == 0 || idx == 1 || idx == 6 || idx == 7
       @size.times do
-        row << Piece.new()
+        row << King.new
+
+        #Left off here
+        
       end
     else
       @size.times do
@@ -60,21 +63,4 @@ end
   end
 
 
-end
-
-class Piece
-
-
-  def to_s
-    return "Piece"
-  end
-
-end
-
-class NullPiece
-
-
-  def to_s
-    return "Null"
-  end
 end

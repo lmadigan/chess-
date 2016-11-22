@@ -1,6 +1,7 @@
 require 'colorize'
 require_relative 'board.rb'
 require_relative 'cursor.rb'
+require_relative 'piece.rb'
 
 class Display
 attr_accessor :cursor, :board, :cursor_pos
@@ -25,7 +26,7 @@ attr_accessor :cursor, :board, :cursor_pos
     end
   end
 
-  
+
 
 
 end
