@@ -65,8 +65,16 @@ end
 class Piece
 
 
+  def to_s
+    return "Piece"
+  end
+
 end
 
 class NullPiece
 
+
+  def to_s
+    return "Null"
+  end
 end
