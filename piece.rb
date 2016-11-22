@@ -1,20 +1,20 @@
 # require_relative 'sliding_pieces.rb'
 # require_relative 'stepping_pieces.rb'
 require_relative 'null_piece.rb'
+require 'byebug'
 
 class Piece
-  attr_reader :color, :symbol, :current_pos
+  attr_reader :color, :symbol, :current_pos, :moves
 
-  def initialize(current_pos, board, color, symbol)
+  def initialize(current_pos, board, color)
     @current_pos = current_pos
     @board = board
     @color = color
-    @symbol = symbol
     @moves = []
     end
 
   def to_s
-    return "Piece"
+    return "#{@symbol}"
   end
 
 
@@ -23,13 +23,14 @@ class Piece
 
   module SteppingPiece
 
-    def self.valid_moves(pos)
+    def valid_moves(pos)
       valid_moves = []
-
+      debugger
       cur_x, cur_y = pos
-      MOVES.each do |(dx, dy)|
+      moves = self.class::MOVES
+      moves.each do |move|
+        dx, dy = move
         new_pos = [cur_x + dx, cur_y + dy]
-
         if new_pos.all? { |coord| coord.between?(0, 7) }
           valid_moves << new_pos
         end
@@ -129,21 +130,15 @@ class Knight < Piece
 end
 
 class King < Piece
+
   include SteppingPiece
 
-  def initialize
+  def initialize(current_pos, board, color)
     @symbol = :K
-    super(current_pos, board, color)
+    super
   end
 
-  MOVES = [[1, 1],
-    [1, -1],
-    [1,  0],
-    [-1, 1],
-    [-1, -1],
-    [-1, 0],
-    [0,  1],
-    [0, -1]]
+  MOVES = [[1, 1],[1, -1],[1,  0],[-1, 1],[-1, -1],[-1, 0],[0,  1],[0, -1]]
 end
 
 

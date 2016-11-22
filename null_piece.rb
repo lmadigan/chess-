@@ -8,6 +8,6 @@ class NullPiece
   end
 
   def to_s
-    return "Null"
+    return "N"
   end
 end

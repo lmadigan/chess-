@@ -16,11 +16,8 @@ attr_accessor :grid
   def fill_empty_board
   @grid.each_with_index do |row, idx|
     if idx == 0 || idx == 1 || idx == 6 || idx == 7
-      @size.times do
-        row << King.new
-
-        #Left off here
-        
+      @size.times do |col_idx|
+        row << King.new([idx, col_idx], self, :black)
       end
     else
       @size.times do
