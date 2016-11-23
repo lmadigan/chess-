@@ -67,12 +67,12 @@ end
 
     if self[start_pos].class == NullPiece
       raise InvalidMoveError.new("No Piece There.")
-    elsif valid_move?(start_pos, end_pos)
-      raise InvalidMoveError.new("Invalid Move!")
+    # elsif valid_move?(start_pos, end_pos)
+    #   raise InvalidMoveError.new("Invalid Move!")
     else
       piece = self[start_pos]
       update_pos(end_pos, piece)
-      self[start_pos] = NullPiece
+      self[start_pos] = NullPiece.instance
     end
 
   end
@@ -82,6 +82,7 @@ end
   end
 
   def valid_move?(start_pos, end_pos)
+
   end
 
   def in_check?(color)
@@ -143,7 +144,7 @@ end
             else
               d_board.king_black = d_class.new([x,y], d_board, d_color)
               d_grid[x] << d_board.king_black
-            end  
+            end
           else
             d_grid[x] << d_class.new([x,y], d_board, d_color)
           end

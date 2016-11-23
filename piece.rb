@@ -29,16 +29,16 @@ class Piece
   end
 
   def move_into_check?(new_pos)
-
+    puts "move into check?"
     dummy_board = @board.dup_board
 
     # dummy_self = dummy_board[@current_pos]
-
+    #
     # dummy_self.current_pos = new_pos
-    dummy_board.move_piece(self.current_pos, new_pos)
-
-    dummy_board.in_check?(self.color)
+    dummy_board.move_piece(@current_pos, new_pos)
+    dummy_board.in_check?(@color)
   end
+
 
 
   module SteppingPiece
@@ -56,15 +56,15 @@ class Piece
 
     def valid_move?(space)
       x,y = space
-      if x.between?(0,7) && y.between?(0,7) && !move_into_check?(space)
+      if x.between?(0,7) && y.between?(0,7)
         if @board[space].class == NullPiece || @board[space].color != @color
           return true
         else
           return false
         end
       end
-    end
   end
+end
 
   module SlidingPiece
     def valid_moves
@@ -85,15 +85,15 @@ class Piece
 
     def valid_move?(space)
       x,y = space
-      if x.between?(0,7) && y.between?(0,7) && !move_into_check?(space)
-        if @board[space].class == NullPiece || @board[space].color != @color
-          return true
-        end
-      else
+      if x.between?(0,7) && y.between?(0,7)
+        if @board[space].color != @color && @board[space].class == NullPiece
+        return true
+      end
+       else
         return false
+
       end
     end
-
   end
 
 end
@@ -183,12 +183,11 @@ class Pawn < Piece
 
     diagonal = [[1,1], [1,-1]]
     diagonal.each do |diag|
-      new_pos = make_move(@current_pos, diag)
+    new_pos = make_move(@current_pos, diag)
       if @board[new_pos].class != NullPiece && new_pos[1].between?(0,7)
         @moves << new_pos if @board[new_pos].color != @color
       end
     end
     @moves
   end
-
 end
