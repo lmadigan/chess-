@@ -1,13 +1,14 @@
-class NullPiece
-  attr_reader :color, :symbol
+require 'singleton'
+require_relative 'piece.rb'
 
-  def initialize
-  end
+class NullPiece < Piece
 
-  module Singleton
-  end
+  include Singleton
 
-  def to_s
-    return "N"
-  end
+    def initialize
+      super([], nil, :none)
+      @symbol = :N
+    end
+
+
 end

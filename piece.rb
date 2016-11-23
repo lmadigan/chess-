@@ -1,6 +1,5 @@
 # require_relative 'sliding_pieces.rb'
 # require_relative 'stepping_pieces.rb'
-require_relative 'null_piece.rb'
 require 'byebug'
 
 class Piece
@@ -11,65 +10,92 @@ class Piece
     @board = board
     @color = color
     @moves = []
-    end
+  end
 
   def to_s
     return "#{@symbol}"
   end
 
+  def current_pos=(position)
+    @board[current_pos] = NullPiece.instance unless current_pos.nil?
+    @board[position] = self
+    @current_pos = position
+  end
 
+  def make_move(cur_pos, move)
+    cur_x, cur_y = cur_pos
+    dx, dy = move
+    return [cur_x + dx, cur_y + dy]
+  end
 
+  def move_into_check?(new_pos)
+
+    dummy_board = @board.dup_board
+
+    # dummy_self = dummy_board[@current_pos]
+
+    # dummy_self.current_pos = new_pos
+    dummy_board.move_piece(self.current_pos, new_pos)
+
+    dummy_board.in_check?(self.color)
+  end
 
 
   module SteppingPiece
-
-    def valid_moves(pos)
-      valid_moves = []
-      debugger
-      cur_x, cur_y = pos
+    def valid_moves
+      pos = @current_pos
       moves = self.class::MOVES
       moves.each do |move|
-        dx, dy = move
-        new_pos = [cur_x + dx, cur_y + dy]
-        if new_pos.all? { |coord| coord.between?(0, 7) }
-          valid_moves << new_pos
-        end
-      end
-
-      @moves = valid_moves
-    end
-
-  end
-
-
-
-  module SlidingPiece
-
-    def self.valid_moves(pos)
-        MOVES.each do |move|
-          new_pos = make_move(pos, move)
-          while valid_move?(new_pos)
-          @moves << new_pos
-          new_pos = make_move(new_pos, move)
+        new_pos = make_move(pos, move)
+          if valid_move?(new_pos)
+            @moves << new_pos
           end
-        end
-      @moves = valid_moves
-    end
-
-    def make_move(pos, move)
-        cur_x, cur_y = pos
-        (dx, dy) = move
-        return [cur_x + dx, cur_y + dy]
+      end
+      @moves
     end
 
     def valid_move?(space)
-      if @board[space] == NullPiece && space.between?(0, 7)
-        return false if @board[space].color == @color
-      else
-        return true
+      x,y = space
+      if x.between?(0,7) && y.between?(0,7) && !move_into_check?(space)
+        if @board[space].class == NullPiece || @board[space].color != @color
+          return true
+        else
+          return false
+        end
       end
     end
   end
+
+  module SlidingPiece
+    def valid_moves
+      pos = @current_pos
+      moves =  self.class::MOVES
+
+        moves.each do |move|
+          new_pos = make_move(pos, move)
+          if valid_move?(new_pos)
+             while valid_move?(new_pos)
+              @moves << new_pos
+             new_pos = make_move(new_pos, move)
+             end
+          end
+        end
+        @moves
+    end
+
+    def valid_move?(space)
+      x,y = space
+      if x.between?(0,7) && y.between?(0,7) && !move_into_check?(space)
+        if @board[space].class == NullPiece || @board[space].color != @color
+          return true
+        end
+      else
+        return false
+      end
+    end
+
+  end
+
 end
 
 class Bishop < Piece
@@ -77,9 +103,9 @@ include SlidingPiece
 
  MOVES = [[1,1], [-1,-1],[-1,1],[1,-1]]
 
- def initialize
+ def initialize(current_pos, board, color)
    @symbol = :B
-   super(current_pos, board, color)
+   super
  end
 
 end
@@ -87,11 +113,11 @@ end
 class Rook < Piece
   include SlidingPiece
 
-  DIRECTIONS = [[0,1], [0, -1], [1, 0], [-1, 0]]
+  MOVES = [[0,1], [0, -1], [1, 0], [-1, 0]]
 
-  def initialize
+  def initialize(current_pos, board, color)
     @symbol = :R
-    super(current_pos, board, color)
+    super
   end
 
 end
@@ -102,9 +128,9 @@ class Queen < Piece
   MOVES = [[0,1], [0, -1], [1, 0], [-1, 0],
       [1,1], [-1,-1],[-1,1],[1,-1]]
 
-    def initialize
+    def initialize(current_pos, board, color)
+      super
       @symbol = :Q
-      super(current_pos, board, color)
     end
 end
 
@@ -122,9 +148,9 @@ class Knight < Piece
     [ 2, -1],
     [ 2,  1]
   ]
-  def initialize
+  def initialize(current_pos, board, color)
     @symbol = :Kn
-    super(current_pos, board, color)
+    super
   end
 
 end
@@ -143,27 +169,26 @@ end
 
 
 class Pawn < Piece
-  include SteppingPiece
 
-  def initialize
+  def initialize(current_pos, board, color)
     @symbol = :P
-    super(current_pos, board, color)
+    super
   end
 
-  MOVES = [[1, 0]]
 
-end
+  def valid_moves
+    direction = [1,0]
+    new_pos = make_move(@current_pos,direction)
+    @moves << new_pos if @board[new_pos].class == NullPiece
 
-class NullPiece
-  attr_reader :color, :symbol
-
-  def initialize
+    diagonal = [[1,1], [1,-1]]
+    diagonal.each do |diag|
+      new_pos = make_move(@current_pos, diag)
+      if @board[new_pos].class != NullPiece && new_pos[1].between?(0,7)
+        @moves << new_pos if @board[new_pos].color != @color
+      end
+    end
+    @moves
   end
 
-  module Singleton
-  end
-
-  def to_s
-    return "Null"
-  end
 end

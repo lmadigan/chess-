@@ -18,7 +18,7 @@ attr_accessor :cursor, :board, :cursor_pos
       row_string = ""
       row.each do |space|
         if space == @board[@cursor.cursor_pos]
-          row_string << space.to_s.colorize(:color => :white, :background =>:light_blue) + "     "
+          row_string << space.to_s.colorize(:color => :white, :background =>:light_blue) + "    "
         else
          row_string << space.to_s + "    "
        end
